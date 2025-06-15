@@ -5,6 +5,7 @@ from docx.shared import Pt
 from io import BytesIO
 from datetime import datetime
 from fpdf import FPDF
+import os
 
 # Page configuration
 st.set_page_config(
@@ -16,10 +17,18 @@ st.set_page_config(
 # Load medication data
 @st.cache_data
 def load_data():
+    # First try to load from the same directory
     if os.path.exists("Crush_Med_Data_Bank_Clean.xlsx"):
         return pd.read_excel("Crush_Med_Data_Bank_Clean.xlsx")
+    # Then try the data/ subdirectory
+    elif os.path.exists("data/Crush_Med_Data_Bank_Clean.xlsx"):
+        return pd.read_excel("data/Crush_Med_Data_Bank_Clean.xlsx")
     else:
-        uploaded_file = st.file_uploader("Upload medication database (Crush_Med_Data_Bank_Clean.xlsx)", type="xlsx")
+        # Fallback to file upload
+        uploaded_file = st.file_uploader(
+            "Upload medication database (Crush_Med_Data_Bank_Clean.xlsx)", 
+            type="xlsx"
+        )
         if uploaded_file:
             return pd.read_excel(uploaded_file)
         else:
@@ -59,10 +68,10 @@ def generate_word_report(patient_name, dob, selected_meds, med_data):
         row_cells[2].text = str(med_info['Alternative form available?'])
         row_cells[3].text = str(med_info['Recommendation'])
     
-    # Professional attribution (footer)
+    # Professional attribution (UPDATED)
     footer = doc.add_paragraph()
     footer.alignment = 2  # Right alignment
-    footer_run = footer.add_run("Crush Med Review Tool developed by: Célio Lara Júnior - Pharmacist - PSI 10003245")
+    footer_run = footer.add_run("Crush Med Review Tool developed by Célio Lara Júnior - Pharmacist - PSI 10003245")
     footer_run.italic = True
     footer_run.font.size = Pt(9)
     
@@ -109,10 +118,10 @@ def generate_pdf_report(patient_name, dob, selected_meds, med_data):
             pdf.cell(col_widths[i], 10, txt=item, border=1)
         pdf.ln()
     
-    # Professional attribution (footer)
+    # Professional attribution (UPDATED)
     pdf.set_y(-20)
     pdf.set_font('Arial', 'I', 8)
-    pdf.cell(0, 10, txt="Crush Med Review Tool developed by: Célio Lara Júnior - Pharmacist - PSI 10003245", ln=1, align='R')
+    pdf.cell(0, 10, txt="Crush Med Review Tool developed by Célio Lara Júnior - Pharmacist - PSI 10003245", ln=1, align='R')
     
     return pdf.output(dest='S').encode('latin1')
 
@@ -154,7 +163,8 @@ def main():
         if selected_meds:
             st.dataframe(
                 med_data[med_data['Drug'].isin(selected_meds)].reset_index(drop=True),
-                use_container_width=True
+                use_container_width=True,
+                height=min(300, len(selected_meds) * 35 + 35)  # Dynamic height
             )
     
     # Generate reports
@@ -162,15 +172,15 @@ def main():
         if not patient_name or not dob or not selected_meds:
             st.error("Please complete all required fields (*)")
         else:
-            # Generate Word report
+            # Generate reports
             doc = generate_word_report(patient_name, dob.strftime('%d/%m/%Y'), selected_meds, med_data)
             word_buffer = BytesIO()
             doc.save(word_buffer)
             
-            # Generate PDF report
             pdf_bytes = generate_pdf_report(patient_name, dob.strftime('%d/%m/%Y'), selected_meds, med_data)
             
-            # Download buttons
+            # Display download buttons
+            st.success("Report generated successfully!")
             col1, col2 = st.columns(2)
             with col1:
                 st.download_button(
