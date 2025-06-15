@@ -16,8 +16,8 @@ st.set_page_config(
 # Load medication data
 @st.cache_data
 def load_data():
-    if os.path.exists("data/Crush_Med_Data_Bank_Clean.xlsx"):
-        return pd.read_excel("data/Crush_Med_Data_Bank_Clean.xlsx")
+    if os.path.exists("Crush_Med_Data_Bank_Clean.xlsx"):
+        return pd.read_excel("Crush_Med_Data_Bank_Clean.xlsx")
     else:
         uploaded_file = st.file_uploader("Upload medication database (Crush_Med_Data_Bank_Clean.xlsx)", type="xlsx")
         if uploaded_file:
