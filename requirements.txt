@@ -1,5 +1,5 @@
 streamlit==1.28.0        # Interface web do app
-pandas==2.0.3            # Manipulação de dados
+pandas                   # Manipulação de dados
 python-docx==0.8.11      # Geração de documentos Word
 openpyxl==3.1.2          # Leitura/escrita de arquivos Excel (.xlsx)
 python-docx              # force reinstall
