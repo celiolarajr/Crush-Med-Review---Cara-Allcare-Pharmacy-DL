@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 from docx import Document
-except ModuleNotFoundError as e:
-    import streamlit as st
-    st.error(f"ModuleNotFoundError: {e}")
 from docx.shared import Pt, Inches
 from io import BytesIO
 from datetime import datetime
