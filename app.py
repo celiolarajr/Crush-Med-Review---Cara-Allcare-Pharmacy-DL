@@ -179,8 +179,7 @@ def main():
             st.session_state["new_meds"].append(new_entry)
             st.session_state["selected_meds"].append(new_med_name.strip())
             st.success(f"Medication '{new_med_name.strip()}' added.")
-            st.experimental_rerun()
-    
+                
     st.markdown("---")
     
     if st.button("Generate Word Report"):
